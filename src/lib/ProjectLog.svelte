@@ -43,7 +43,7 @@
 	</div>
 {:else}
 	<div class="project-log">
-		<h3>> select a project to view</h3>
+		<h3 class="empty-state">> select a project to view</h3>
 	</div>
 {/if}
 
@@ -51,7 +51,7 @@
 	@import '../styles/variables.scss';
 
 	.project-log {
-		height: 70vh;
+		height: var(--panel-height);
 		overflow-y: auto;
 		scrollbar-width: thin;
 		scrollbar-color: $color-ember transparent;
@@ -81,11 +81,6 @@
 		font-family: $font-family;
 
 		color: $color-mossy;
-		
-		h3 {
-			font-size: 1rem;
-			font-weight: normal;
-		}
 	}
 
 	.project-title {
@@ -122,7 +117,7 @@
 	}
 
 	.project-tags {
-		color: $color-ember;
+		color: $color-moonlight;
 
 		display: flex;
 		gap: 0.5rem;
@@ -160,8 +155,7 @@
 	}
 
 	.section {
-		margin-top: 1rem;
-		padding-top: 0.5rem;
+		margin-top: 1.25rem;
 		border-top: 2px dotted $color-ember;
 	}
 
@@ -172,14 +166,42 @@
 
 	.log-tag {
 		color: $color-ember;
+		font-size: 1.2rem;
+		font-weight: bold;
+		margin-bottom: 0.5rem;
 	}
 
 	.log-header {
 		color: $color-twilight;
+		margin-bottom: 0.2rem;
+		margin-top: 0;
+		font-size: 0.9rem;
 	}
 
 	.log-description {
 		color: $color-mossy;
+		margin-top: 0;
+		font-size: 0.7rem;
+	}
+
+	.empty-state {
+		color: $color-mossy;
+		font-size: 1rem;
+		font-weight: normal;
+		margin: 0;
+	}
+
+	@media (max-width: 1200px) {
+		.project-log {
+			height: auto;
+			min-height: 40vh;
+		}
+	}
+
+	@media (max-width: 768px) {
+		.project-log {
+			min-height: 35vh;
+		}
 	}
 
 </style>

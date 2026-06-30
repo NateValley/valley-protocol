@@ -156,7 +156,7 @@ export const projects: Project[] = [
 		]
 	},
 	{
-		title: 'Super Cloud',
+		title: 'Super Cloud Sourced',
 		logs: [
 			// #region Systems Design
 			{

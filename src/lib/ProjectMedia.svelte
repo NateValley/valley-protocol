@@ -8,43 +8,34 @@
 	// simple cache so we don’t refetch on every reactive pass
 	let steamCache: Record<string, { ok: boolean; name?: string; header_image?: string; short_description?: string }> = {};
 
+	function steamImageSrc(src?: string) {
+		if (!src) return '';
+
+		if (src.startsWith('http://') || src.startsWith('https://')) {
+			return src;
+		}
+
+		return `${base}${src.startsWith('/') ? src : `/${src}`}`;
+	}
+
 	async function loadSteam(appid: string) {
 		if (steamCache[appid]) return steamCache[appid];
+
 		try {
-			// Try CORS proxy first for live Steam API data
-			const corsProxy = 'https://api.allorigins.win/raw?url=';
-			const steamUrl = `https://store.steampowered.com/api/appdetails?appids=${appid}&filters=basic`;
-			const r = await fetch(`${corsProxy}${encodeURIComponent(steamUrl)}`);
-			
-			if (!r.ok) throw new Error('CORS proxy failed');
-			
-			const data = await r.json();
-			const appData = data[appid];
-			
-			if (appData?.success && appData?.data) {
-				steamCache[appid] = {
-					ok: true,
-					header_image: appData.data.header_image,
-					short_description: appData.data.short_description
-				};
-			} else {
-				throw new Error('Steam API returned no data');
+			const r = await fetch(`${base}/steam/${appid}.json`);
+
+			if (!r.ok) {
+				throw new Error(`Static Steam data not found for appid ${appid}`);
 			}
-			
-			return steamCache[appid];
+
+			const j = await r.json();
+			steamCache[appid] = j;
+			return j;
 		} catch (error) {
-			// Fallback to static JSON files
-			try {
-				const r = await fetch(`${base}/steam/${appid}.json`);
-				if (!r.ok) throw new Error('Static steam data not found');
-				const j = await r.json();
-				steamCache[appid] = j;
-				return j;
-			} catch (fallbackError) {
-				// Final fallback
-				steamCache[appid] = { ok: false };
-				return { ok: false };
-			}
+			console.error('Failed to load static Steam data:', error);
+
+			steamCache[appid] = { ok: false };
+			return { ok: false };
 		}
 	}
 
@@ -78,7 +69,7 @@
 						{#if s.ok}
 							<div class="steam-content">
 								<img
-									src={s.header_image ?? ''}
+									src={steamImageSrc(s.header_image)}
 									alt={headerParts.mainText}
 									class="steam-image"
 									loading="lazy"
@@ -89,7 +80,6 @@
 									{/if}
 									<div class="steam-links">
 										<a href={m.url} target="_blank" rel="noopener noreferrer">View Store Page</a>
-										<a href={`steam://store/${getSteamAppId(m.url)}`}>Open in Steam</a>
 									</div>
 								</div>
 							</div>
@@ -200,185 +190,201 @@
   @import '../styles/variables.scss';
 
   .media-container {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    height: 100%;
-    overflow-y: auto;
-    align-items: center;
-    padding: 0.5rem 1rem 0.5rem 0.5rem;
-    scrollbar-width: thin;
-    scrollbar-color: $color-ember transparent;
-    
-    &::-webkit-scrollbar {
-      width: 4px;
-      height: 4px;
-    }
-    
-    &::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    
-    &::-webkit-scrollbar-thumb {
-      background: $color-ember;
-      border-radius: 2px;
-    }
-    
-    &::-webkit-scrollbar-button {
-      display: none;
-    }
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+	height: 100%;
+	overflow-y: auto;
+	align-items: center;
+	padding: 0.5rem 1rem 0.5rem 0.5rem;
+	scrollbar-width: thin;
+	scrollbar-color: $color-ember transparent;
+		
+	&::-webkit-scrollbar {
+	  width: 4px;
+	  height: 4px;
+	}
+		
+	&::-webkit-scrollbar-track {
+	  background: transparent;
+	}
+		
+	&::-webkit-scrollbar-thumb {
+	  background: $color-ember;
+	  border-radius: 2px;
+	}
+		
+	&::-webkit-scrollbar-button {
+	  display: none;
+	}
   }
 
   .media-item {
-    width: 100%;
-    text-align: center;
+	width: 100%;
+	text-align: center;
 
-    .media-header-container {
-      text-align: center;
-      margin-bottom: 0.75rem;
-    }
+	.media-header-container {
+	  text-align: center;
+	  margin-bottom: 0.75rem;
+	}
 
-    .media-header {
-      color: $color-ember;
-      margin: 0;
-      font-family: $font-family;
-      font-size: 1rem;
-      font-weight: normal;
-      line-height: 1.4;
-    }
+	.media-header {
+	  color: $color-ember;
+	  margin: 0;
+	  font-family: $font-family;
+	  font-size: 1rem;
+	  font-weight: normal;
+	  line-height: 1.4;
+	}
 
-    .media-date {
-      color: $color-twilight;
-      font-family: $font-family;
-      font-size: 0.875rem;
-      margin-top: 0.25rem;
-    }
+	.media-date {
+	  color: $color-twilight;
+	  font-family: $font-family;
+	  font-size: 0.875rem;
+	  margin-top: 0.25rem;
+	}
 
-    .media-content {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-top: 0.5rem;
+	.media-content {
+	  display: flex;
+	  justify-content: center;
+	  align-items: center;
+	  margin-top: 0.5rem;
 
-      img, video, iframe {
-        max-width: 100%;
-        border-radius: $radius;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-      }
+	  img, video, iframe {
+		max-width: 100%;
+		border-radius: $radius;
+		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+	  }
 
-      img {
-        height: auto;
-        object-fit: cover;
-      }
+	  img {
+		height: auto;
+		object-fit: cover;
+	  }
 
-      video {
-        height: auto;
-        max-height: 300px;
-      }
+	  video {
+		height: auto;
+		max-height: 300px;
+	  }
 
-      iframe {
-        width: 100%;
-        height: 200px;
-        border: none;
-        
-        &[title*="Google Slides"] {
-          width: 480px;
-          height: 299px;
-          max-width: 100%;
-        }
-      }
+	  iframe {
+		width: 100%;
+		height: 200px;
+		border: none;
+		
+		&[title*="Google Slides"] {
+		  width: 480px;
+		  height: 299px;
+		  max-width: 100%;
+		}
+	  }
 
-      &.slides-content {
-        width: auto;
-        max-width: 100%;
-        display: inline-flex;
-        justify-content: center;
-      }
+	  &.slides-content {
+		width: auto;
+		max-width: 100%;
+		display: inline-flex;
+		justify-content: center;
+	  }
 
-      .external-link {
-        background: rgba($color-mossy, 0.1);
-        border: 1px solid $color-mossy;
-        border-radius: $radius;
-        padding: 1rem;
-        text-align: center;
-        color: $color-mossy;
-        width: 100%;
+	  .external-link {
+		background: rgba($color-mossy, 0.1);
+		border: 1px solid $color-mossy;
+		border-radius: $radius;
+		padding: 1rem;
+		text-align: center;
+		color: $color-mossy;
+		width: 100%;
 
-        a {
-          color: $color-moonlight;
-          text-decoration: underline;
+		a {
+		  color: $color-moonlight;
+		  text-decoration: underline;
 
-          &:hover {
-            color: $color-ember;
-          }
-        }
+		  &:hover {
+			color: $color-ember;
+		  }
+		}
 
-        p {
-          margin-top: 0.5rem;
-          font-size: 0.875rem;
-          opacity: 0.7;
-        }
-      }
+		p {
+		  margin-top: 0.5rem;
+		  font-size: 0.875rem;
+		  opacity: 0.7;
+		}
+	  }
 
-      .steam-content {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        background: transparent;
-        border: 1px solid $color-ember;
-        border-radius: $radius;
-        padding: 1rem;
-        
-        .steam-image {
-          width: 100%;
-          height: auto;
-          border-radius: $radius;
-          object-fit: cover;
-          margin-bottom: 1rem;
-        }
+	  .steam-content {
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		background: transparent;
+		border: 1px solid $color-ember;
+		border-radius: $radius;
+		padding: 1rem;
+		
+		.steam-image {
+		  width: 100%;
+		  height: auto;
+		  border-radius: $radius;
+		  object-fit: cover;
+		  margin-bottom: 1rem;
+		}
 
-        .steam-info {
-          .steam-name {
-            font-weight: bold;
-            color: $color-ember;
-            margin: 0 0 0.5rem 0;
-            font-size: 1rem;
-            text-align: center;
-          }
+		.steam-info {
+		  .steam-name {
+			font-weight: bold;
+			color: $color-ember;
+			margin: 0 0 0.5rem 0;
+			font-size: 1rem;
+			text-align: center;
+		  }
 
-          .steam-description {
-            color: $color-mossy;
-            font-size: 0.875rem;
-            line-height: 1.4;
-            margin: 0 0 1rem 0;
-            text-align: center;
-            text-transform: lowercase;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-          }
+		  .steam-description {
+			color: $color-mossy;
+			font-size: 0.875rem;
+			line-height: 1.4;
+			margin: 0 0 1rem 0;
+			text-align: center;
+			text-transform: lowercase;
 
-          .steam-links {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            flex-wrap: wrap;
+			max-height: 4.9rem;
+			overflow-y: auto;
+			padding-right: 0.5rem;
 
-            a {
-              color: $color-dusk;
-              text-decoration: underline;
-              font-size: 0.875rem;
-              text-transform: lowercase;
+			scrollbar-width: thin;
+			scrollbar-color: $color-ember transparent;
 
-              &:hover {
-                color: $color-moonlight;
-                text-shadow: 0 0 5px $color-moonlight;
-              }
-            }
-          }
-        }
-      }
-    }
+			&::-webkit-scrollbar {
+				width: 4px;
+			}
+
+			&::-webkit-scrollbar-track {
+				background: transparent;
+			}
+
+			&::-webkit-scrollbar-thumb {
+				background: $color-ember;
+				border-radius: 2px;
+			}
+		}
+
+		  .steam-links {
+			display: flex;
+			justify-content: center;
+			gap: 1rem;
+			flex-wrap: wrap;
+
+			a {
+			  color: $color-dusk;
+			  text-decoration: underline;
+			  font-size: 0.875rem;
+			  text-transform: lowercase;
+
+			  &:hover {
+				color: $color-moonlight;
+				text-shadow: 0 0 5px $color-moonlight;
+			  }
+			}
+		  }
+		}
+	  }
+	}
   }
 </style>

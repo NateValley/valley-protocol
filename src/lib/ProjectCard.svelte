@@ -10,7 +10,12 @@
 	}
 </script>
 
-<button class="project-card" onclick={select}>
+<button
+	class="project-card"
+	class:selected={$selectedProject === projectData}
+	aria-pressed={$selectedProject === projectData}
+	onclick={select}
+>
 	<h2>> {title}</h2>
 	<h5>{tags.join(', ')}</h5>
 </button>
@@ -34,6 +39,19 @@
 		&:hover {
 			color: $color-moonlight;
 			text-shadow: 0 0 5px $color-moonlight;
+		}
+
+		&.selected {
+			color: $color-dusk;
+
+			&:hover {
+				color: $color-twilight;
+				text-shadow: 0 0 5px $color-twilight;
+			}
+		}
+
+		h2 {
+			text-transform: uppercase;
 		}
 	}
 </style>

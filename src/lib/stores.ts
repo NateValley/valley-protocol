@@ -4,10 +4,10 @@ import type { Project } from "./projects";
 export const selectedProject = writable<Project | null>(null);
 
 export const navItems = [
-	{ label: 'projects', href: '/site-valley/'},
-	{ label: 'about', href: '/site-valley/about'},
-	{ label: 'resume', href: '/site-valley/resume'},
-	{ label: 'contact', href: '/site-valley/contact'}
+	{ label: 'projects', href: '/valley-protocol/'},
+	{ label: 'about me!', href: '/valley-protocol/about'},
+	{ label: 'resume', href: '/valley-protocol/resume'},
+	{ label: 'contact', href: '/valley-protocol/contact'}
 ]
 
 export const tags = [

@@ -20,7 +20,10 @@
 		justify-content: space-between;
 		text-align: left;
 
-		min-width: 400px;
+		width: 100%;
+		min-width: 0;
+		max-width: 100%;
+		gap: 1.25rem;
 
 		border: 1px solid transparent;
 		border-radius: $radius;
@@ -38,6 +41,20 @@
 
 		&.active {
 			color: $color-dusk;
+
+			&:hover {
+				color: $color-twilight;
+				text-shadow: 0 0 5px $color-twilight;
+			}
 		}
+	}
+
+	.label {
+		min-width: 0;
+		overflow-wrap: anywhere;
+	}
+
+	.state {
+		flex: 0 0 auto;
 	}
 </style>

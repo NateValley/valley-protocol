@@ -4,7 +4,6 @@
 	import { selectedProject, tags } from '$lib/stores';
 	
 	import ProjectCard from '$lib/ProjectCard.svelte';
-	import ProjectDetail from '$lib/ProjectLog.svelte';
 	import TagToggle from '$lib/TagToggle.svelte';
     import ProjectLog from '$lib/ProjectLog.svelte';
 	import ProjectMedia from '$lib/ProjectMedia.svelte';
@@ -32,57 +31,65 @@
 <div>
 	<div class="portfolio-grid">
 
-		<div class="filters-cards-column">
-			<div class="project-filters">
-				<h3 class="filters-header">project filters:</h3>
-				<div class="tags">
-					{#each tags as tag}
-						<TagToggle
-							{tag}
-							isActive={activeTags.includes(tag)}
-							toggle={toggleTag}
-						/>
-					{/each}
-				</div>
-			</div>
-	
-			<div class="projects-group">
-				<h5>selected project: {$selectedProject?.title ?? 'NULL'}</h5>
-				<div class="project-list">
-					{#if filteredProjects.length > 0}
-						{#each filteredProjects as project}
-							<ProjectCard
-								title={project.title}
-								tags={project.tags}
-								projectData={project}
+		<div class="project-list-pane">
+			<h2 class="panel-header">PROJECT LIST</h2>
+			<div class="filters-cards-column">
+				<div class="project-filters">
+					<h3 class="filters-header">project filters:</h3>
+					<div class="tags">
+						{#each tags as tag}
+							<TagToggle
+								{tag}
+								isActive={activeTags.includes(tag)}
+								toggle={toggleTag}
 							/>
 						{/each}
-					{:else}
-						<p>> no matching projects !</p>
-					{/if}
+					</div>
 				</div>
-			</div>	
+		
+				<div class="projects-group">
+					<div class="project-list">
+						{#if filteredProjects.length > 0}
+							{#each filteredProjects as project}
+								<ProjectCard
+									title={project.title}
+									tags={project.tags}
+									projectData={project}
+								/>
+							{/each}
+						{:else}
+							<p>> no matching projects !</p>
+						{/if}
+					</div>
+				</div>	
+			</div>
 		</div>
 
 		<!-- project logs (middle) -->
 		<div class="project-log-pane">
-				<ProjectLog />
+			<h2 class="panel-header">SELECTED PROJECT</h2>
+			<ProjectLog />
 		</div>
 
-		<div class="project-media">
-			{#if $selectedProject && $selectedProject.media.length > 0}
-				<ProjectMedia project={$selectedProject} />
-			{:else}
-				{#if $selectedProject}
-					<div class="no-media-section">
-						<h3 class="log-tag">> NO MEDIA FOUND :[</h3>
-					</div>
-				{:else}
-					<div class="no-media">
-						<h3>> select a project to view</h3>
-					</div>
+		<div class="project-media-pane">
+			<h2 class="panel-header">PROJECT MEDIA</h2>
+			<div class="project-media">
+				<div class="project-media-content">
+					{#if $selectedProject && $selectedProject.media.length > 0}
+						<ProjectMedia project={$selectedProject} />
+					{:else}
+						{#if $selectedProject}
+							<div class="no-media-section">
+								<h3 class="log-tag">> NO MEDIA FOUND :[</h3>
+							</div>
+					{:else}
+						<div class="no-media">
+							<h3 class="empty-state">> select a project to view</h3>
+						</div>
+					{/if}
 				{/if}
-			{/if}
+				</div>
+			</div>
 		</div>
 
 	</div>
@@ -96,9 +103,11 @@
 			color: $color-mossy;
 			font-family: $font-family;
 			
-			h3 {
+			.empty-state {
+				color: $color-mossy;
 				font-size: 1rem;
 				font-weight: normal;
+				margin: 0;
 			}
 		}
 	}

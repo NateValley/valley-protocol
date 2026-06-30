@@ -22,7 +22,7 @@ const config = {
 			fallback: 'index.html'
 		}),
 		paths: {
-			base: '/site-valley'
+			base: '/valley-protocol'
 		}
 	}
 };
