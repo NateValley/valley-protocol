@@ -50,7 +50,16 @@
 
 		h2 {
 			margin: 0;
+			overflow: hidden;
+			text-overflow: clip;
 			text-transform: uppercase;
+			white-space: nowrap;
+		}
+	}
+
+	@media (max-width: 768px) {
+		.project-card {
+			font-size: clamp(0.72rem, 4vw, 1rem);
 		}
 	}
 </style>

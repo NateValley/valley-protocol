@@ -247,6 +247,7 @@
 		padding: 0.45rem 0.7rem;
 		text-align: center;
 		text-decoration: none;
+		white-space: nowrap;
 		transition:
 			border-color $transition,
 			color $transition,
@@ -331,8 +332,17 @@
 		}
 
 		.mobile-project-navigation .project-navigation-button {
+			font-size: clamp(0.62rem, 3.2vw, 0.8rem);
 			margin-top: 0;
 			min-width: 0;
+			padding-inline: clamp(0.4rem, 2vw, 0.7rem);
+		}
+	}
+
+	@media (max-width: 768px) {
+		.intro-project-navigation .project-navigation-button {
+			font-size: clamp(0.62rem, 3.2vw, 0.8rem);
+			padding-inline: clamp(0.4rem, 2vw, 0.7rem);
 		}
 	}
 
