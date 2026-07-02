@@ -2,7 +2,6 @@
 	import { selectedProject } from "./stores";
 
 	export let title: string;
-	export let tags: string[];
 	export let projectData: any; // can pass whole project object
 
 	function select() {
@@ -17,7 +16,6 @@
 	onclick={select}
 >
 	<h2>> {title}</h2>
-	<h5>{tags.join(', ')}</h5>
 </button>
 
 <style lang="scss";>
@@ -28,7 +26,7 @@
 		text-align: left;
 		border: 1px solid transparent;
 		border-radius: $radius;
-		padding: 0.5rem;
+		padding: 0.25rem 0.5rem;
 		background: transparent;
 		color: $color-mossy;
 		font-family: $font-family;
@@ -51,6 +49,7 @@
 		}
 
 		h2 {
+			margin: 0;
 			text-transform: uppercase;
 		}
 	}

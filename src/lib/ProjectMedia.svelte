@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Project } from '$lib/projects';
-	import { classifyMedia, getSteamAppId, toYouTubeEmbed, getItchParts, toSlidesEmbed } from '$lib/media';
+	import { classifyMedia, getSteamAppId, toVimeoEmbed, toYouTubeEmbed, getItchParts, toSlidesEmbed } from '$lib/media';
 	import { base } from '$app/paths';
 
 	export let project: Project;
@@ -61,10 +61,6 @@
 				{#await loadSteam(appId) then s}
 					{@const headerParts = parseHeader(m.header)}
 					<div class="media-item">
-						<h3 class="media-header">{headerParts.mainText}</h3>
-						{#if headerParts.dateText}
-							<div class="media-date">{headerParts.dateText}</div>
-						{/if}
 					<div class="media-content">
 						{#if s.ok}
 							<div class="steam-content">
@@ -92,15 +88,16 @@
 							</div>
 						{/if}
 					</div>
+					<p class="media-caption">
+						{headerParts.mainText}{#if headerParts.dateText}
+							{` ${headerParts.dateText}`}
+						{/if}
+					</p>
 				</div>
 				{/await}
 			{:else}
 				{@const headerParts = parseHeader(m.header)}
 				<div class="media-item">
-					<h3 class="media-header">{headerParts.mainText}</h3>
-					{#if headerParts.dateText}
-						<div class="media-date">{headerParts.dateText}</div>
-					{/if}
 					<div class="media-content">
 						<div class="external-link">
 							<a href={m.url} target="_blank" rel="noopener noreferrer">
@@ -109,12 +106,16 @@
 							<p>Failed to parse Steam App ID</p>
 						</div>
 					</div>
+					<p class="media-caption">
+						{headerParts.mainText}{#if headerParts.dateText}
+							{` ${headerParts.dateText}`}
+						{/if}
+					</p>
 				</div>
 			{/if}
 
 		{:else if classifyMedia(m.url) === 'youtube'}
 			<div class="media-item">
-				<h3 class="media-header">{m.header}</h3>
 				<div class="media-content">
 					{#if toYouTubeEmbed(m.url)}
 						<iframe 
@@ -126,15 +127,28 @@
 						</iframe>
 					{/if}
 				</div>
+				<p class="media-caption">{m.header}</p>
+			</div>
+
+		{:else if classifyMedia(m.url) === 'vimeo'}
+			<div class="media-item">
+				<div class="media-content">
+					{#if toVimeoEmbed(m.url)}
+						<iframe
+							src={toVimeoEmbed(m.url)}
+							title="Vimeo video"
+							frameborder="0"
+							allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+							allowfullscreen>
+						</iframe>
+					{/if}
+				</div>
+				<p class="media-caption">{m.header}</p>
 			</div>
 
 		{:else if classifyMedia(m.url) === 'slides'}
 			{@const headerParts = parseHeader(m.header)}
 			<div class="media-item">
-				<h3 class="media-header">{headerParts.mainText}</h3>
-				{#if headerParts.dateText}
-					<div class="media-date">{headerParts.dateText}</div>
-				{/if}
 				<div class="media-content slides-content">
 					{#if toSlidesEmbed(m.url)}
 						<iframe 
@@ -145,11 +159,15 @@
 						</iframe>
 					{/if}
 				</div>
+				<p class="media-caption">
+					{headerParts.mainText}{#if headerParts.dateText}
+						{` ${headerParts.dateText}`}
+					{/if}
+				</p>
 			</div>
 
 		{:else if classifyMedia(m.url) === 'itch'}
 			<div class="media-item">
-				<h3 class="media-header">{m.header}</h3>
 				<div class="media-content">
 					<div class="external-link">
 						<a href={m.url} target="_blank" rel="noopener noreferrer" on:click={() => open(m.url)}>
@@ -157,23 +175,24 @@
 						</a>
 					</div>
 				</div>
+				<p class="media-caption">{m.header}</p>
 			</div>
 
 		{:else if classifyMedia(m.url) === 'image'}
 			{@const headerParts = parseHeader(m.header)}
 			<div class="media-item">
-				<h3 class="media-header">{headerParts.mainText}</h3>
-				{#if headerParts.dateText}
-					<div class="media-date">{headerParts.dateText}</div>
-				{/if}
 				<div class="media-content">
 					<img src={m.url.startsWith('/') && !m.url.startsWith('http') ? `${base}${m.url}` : m.url} alt="Project media" loading="lazy" />
 				</div>
+				<p class="media-caption">
+					{headerParts.mainText}{#if headerParts.dateText}
+						{` ${headerParts.dateText}`}
+					{/if}
+				</p>
 			</div>
 
 		{:else}
 			<div class="media-item">
-				<h3 class="media-header">{m.header}</h3>
 				<div class="media-content">
 					<div class="external-link">
 						<a href={m.url} target="_blank" rel="noopener noreferrer" on:click={() => open(m.url)}>
@@ -181,6 +200,7 @@
 						</a>
 					</div>
 				</div>
+				<p class="media-caption">{m.header}</p>
 			</div>
 		{/if}
 	{/each}
@@ -221,34 +241,30 @@
 
   .media-item {
 	width: 100%;
+	margin: 0;
 	text-align: center;
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
 
-	.media-header-container {
-	  text-align: center;
-	  margin-bottom: 0.75rem;
-	}
-
-	.media-header {
-	  color: $color-ember;
+	.media-caption {
+	  color: $color-dusk;
+	  font-size: 0.72rem;
+	  font-style: italic;
+	  line-height: 1.35;
 	  margin: 0;
-	  font-family: $font-family;
-	  font-size: 1rem;
-	  font-weight: normal;
-	  line-height: 1.4;
-	}
+	  white-space: pre-line;
 
-	.media-date {
-	  color: $color-twilight;
-	  font-family: $font-family;
-	  font-size: 0.875rem;
-	  margin-top: 0.25rem;
+	  &::before {
+		content: '> ';
+		color: $color-dusk;
+	  }
 	}
 
 	.media-content {
 	  display: flex;
 	  justify-content: center;
 	  align-items: center;
-	  margin-top: 0.5rem;
 
 	  img, video, iframe {
 		max-width: 100%;

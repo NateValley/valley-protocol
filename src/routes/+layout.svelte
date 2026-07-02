@@ -21,7 +21,7 @@
 		},
 		{
 			src: `${base}/media/about/profile-2.jpg`,
-			caption: 'restarting multiplayer in pawfee bean!'
+			caption: 'restarting multiplayer in Pawfee Bean!'
 		},
 		{
 			src: `${base}/media/about/profile-3.jpg`,
@@ -86,6 +86,7 @@
 
 <main>
 	<header class="valley-header">
+		<img class="site-logo" src={`${base}/media/logo.jpg`} alt="Valley Protocol logo" />
 		<h2>> valley protocol<span class="blinker">_</span></h2>
 		<p>crafted by nathaniel berl valdenor :] gameplay systems and custom tools development</p>
 	</header>

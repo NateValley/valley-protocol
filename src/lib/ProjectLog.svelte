@@ -1,7 +1,12 @@
 <script lang="ts">
+	import { onMount, tick } from 'svelte';
 	import { selectedProject } from "./stores";
 
 	let groupedLogs = new Map();
+	let projectTagsElement: HTMLHeadingElement | undefined;
+	let projectTagsFontSize = 0.78;
+	const maxProjectTagsFontSize = 0.78;
+	const minProjectTagsFontSize = 0.45;
 
 	$: groupedLogs = (() => {
 			if (!$selectedProject?.logs) return new Map();
@@ -16,12 +21,47 @@
 			}
 			return map;
 		})();
+
+	$: if ($selectedProject && projectTagsElement) {
+		fitProjectTags();
+	}
+
+	async function fitProjectTags() {
+		projectTagsFontSize = maxProjectTagsFontSize;
+		await tick();
+
+		if (!projectTagsElement) return;
+
+		const { clientWidth, scrollWidth } = projectTagsElement;
+		if (clientWidth <= 0 || scrollWidth <= clientWidth) return;
+
+		projectTagsFontSize = Math.max(
+			minProjectTagsFontSize,
+			maxProjectTagsFontSize * (clientWidth / scrollWidth) * 0.98
+		);
+	}
+
+	onMount(() => {
+		const resizeObserver = new ResizeObserver(() => fitProjectTags());
+
+		if (projectTagsElement) {
+			resizeObserver.observe(projectTagsElement);
+		}
+
+		return () => resizeObserver.disconnect();
+	});
 </script>
 
 {#if $selectedProject}
 	<div class="project-log">
 		<h1 class="project-title">{$selectedProject.title.toUpperCase()}</h1>
-		<h5 class="project-tags">{$selectedProject.tags.join(', ').toUpperCase()}</h5>
+		<h5
+			class="project-tags"
+			bind:this={projectTagsElement}
+			style:font-size={`${projectTagsFontSize}rem`}
+		>
+			{$selectedProject.tags.join(', ').toUpperCase()}
+		</h5>
 	
 		{#if !$selectedProject.logs?.length}
 			<div class="section">
@@ -118,38 +158,13 @@
 
 	.project-tags {
 		color: $color-moonlight;
-
-		display: flex;
-		gap: 0.5rem;
+		display: block;
+		line-height: 1.35;
 		white-space: nowrap;
-		padding-bottom: 0.25rem;
 		margin-top: 0.25rem;
 		margin-bottom: 0.25rem;
-
-		overflow-x: auto;
+		overflow-x: hidden;
 		overflow-y: hidden;
-
-		scrollbar-width: thin;
-		scrollbar-color: $color-ember transparent;
-		
-		&::-webkit-scrollbar {
-			width: 4px;
-			height: 4px;
-		}
-		
-		&::-webkit-scrollbar-track {
-			background: transparent;
-		}
-		
-		&::-webkit-scrollbar-thumb {
-			background: $color-ember;
-			border-radius: 2px;
-		}
-		
-		&::-webkit-scrollbar-button {
-			display: none;
-		}
-
 		height: auto;
 		max-width: 100%;
 	}

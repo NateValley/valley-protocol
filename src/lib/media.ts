@@ -1,4 +1,4 @@
-type MediaType = 'youtube' | 'steam' | 'itch' | 'image' | 'slides' | 'link'
+type MediaType = 'youtube' | 'vimeo' | 'steam' | 'itch' | 'image' | 'slides' | 'link'
 
 const IMAGE_EXT = /\.(png|jpe?g|gif|webp|avif)$/i;
 
@@ -16,6 +16,9 @@ export function classifyMedia(url: string): MediaType {
 			host === 'youtu.be' ||
 			host === 'music.youtube.com'
 		) return 'youtube';
+
+		// Vimeo
+		if (host === 'vimeo.com' || host === 'player.vimeo.com') return 'vimeo';
 
 		// Steam
 		if (host === 'store.steampowered.com') return 'steam';
@@ -54,6 +57,28 @@ export function toYouTubeEmbed(url: string): string | null {
 			const id = u.searchParams.get('v');
 			if (id) return `https://www.youtube.com/embed/${id}`;
 		}
+		return null;
+	} catch {
+		return null;
+	}
+}
+
+// Vimeo
+export function toVimeoEmbed(url: string): string | null {
+	try {
+		const u = new URL(url);
+		const host = u.hostname.replace(/^www\./, '');
+
+		if (host === 'player.vimeo.com') {
+			const match = u.pathname.match(/^\/video\/(\d+)/);
+			return match?.[1] ? `https://player.vimeo.com/video/${match[1]}` : null;
+		}
+
+		if (host === 'vimeo.com') {
+			const id = u.pathname.split('/').filter(Boolean).find((part) => /^\d+$/.test(part));
+			return id ? `https://player.vimeo.com/video/${id}` : null;
+		}
+
 		return null;
 	} catch {
 		return null;

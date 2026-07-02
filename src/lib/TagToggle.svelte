@@ -8,8 +8,8 @@
 	class="tag-toggle {isActive ? 'active' : ''}"
 	onclick={() => toggle(tag)}
 >
-	<span class="label">&gt; {tag.toLowerCase()}</span>
-	<span class="state">[{isActive ? 'x' : ' '}]</span>
+	<span class="state">[<span class="mark">{isActive ? 'X' : ' '}</span>]</span>
+	<span class="label">{tag.toLowerCase()}</span>
 </button>
 
 <style lang="scss">
@@ -17,20 +17,21 @@
 
 	.tag-toggle {
 		display: flex;
-		justify-content: space-between;
+		justify-content: flex-start;
+		align-items: center;
 		text-align: left;
 
 		width: 100%;
 		min-width: 0;
 		max-width: 100%;
-		gap: 1.25rem;
+		gap: 0.5rem;
 
 		border: 1px solid transparent;
 		border-radius: $radius;
 		background: transparent;
 		color: $color-mossy;
 		font-family: $font-family;
-		font-size: 0.85rem;
+		font-size: 0.75rem;
 		cursor: pointer;
 		transition: box-shadow 0.2s ease, background $transition, color $transition;
 		
@@ -56,5 +57,11 @@
 
 	.state {
 		flex: 0 0 auto;
+	}
+
+	.mark {
+		display: inline-block;
+		width: 1ch;
+		text-align: center;
 	}
 </style>
