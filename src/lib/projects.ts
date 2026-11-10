@@ -29,6 +29,65 @@ interface ProjectLink {
 
 export const projects: Project[] = [
 	{
+		title: 'Scryptid Sightings',
+		summary: 'a choice-driven visual novel developed from scratch in Godot as an entry for the So Bad It\'s Good Jam 2026',
+		logs: [
+			// #region Tools Programming
+			{
+				tag: 'tools',
+				subheader: 'custom dialogue authoring tool',
+				description: 'developed an in-engine tool for writing and organizing dialogue, narrative sequences, and player choices'
+			},
+			// #endregion
+
+			// #region Systems Design
+			{
+				tag: 'systems design',
+				subheader: 'data-driven narrative architecture',
+				description: 'architected a resource-based dialogue system that connects dialogue, story, and player choices to support a branching narrative'
+			},
+			// #endregion
+
+			// #region Gameplay
+			{
+				tag: 'gameplay',
+				subheader: 'interacctive dialogue system',
+				description: 'programmed branching dialogue interactions with player choices and animated text'
+			},
+			{
+				tag: 'gameplay',
+				subheader: 'dynamic character presentation',
+				description: 'implemented dialogue-driven character sprite swapping, background changes, and scene transitions'
+			},
+			{
+				tag: 'gameplay',
+				subheader: 'user interface and scene flow',
+				description: 'developed title screen functionality, credits, and transitions between gameplay sequences'
+			},
+			// #endregion
+
+			// #region Misc.
+			{
+				tag: 'misc.',
+				subheader: 'narrative writing and dialogue',
+				description: 'served as the primary writer for the gameplay, dialogue, and branching conversations with collaborative feedback'
+			}
+			// #endregion
+		],
+		tags: ['systems design', 'gameplay', 'tools'],
+		previewMedia: [
+		],
+		links: [
+			{ label: 'itch.io page', url: 'https://natevalley.itch.io/scryptid-sightings' }
+		],
+		role: 'programmer / writer',
+		builtWith: 'godot',
+		team: 'in collaboration with Ashley Knapp',
+		media: [
+			{ header: 'title screen', url: '/media/scryptid/title.PNG'}
+		]
+	},
+	{
 		title: 'PBA Court Kings',
 		summary: 'an officially licensed game where i developed runtime character customization tools and editor workflows.',
 		logs: [
